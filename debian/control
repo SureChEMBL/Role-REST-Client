@@ -3,23 +3,22 @@ Section: perl
 Priority: optional
 Maintainer: Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>
 Uploaders: Michael Prokop <mika@debian.org>
-Build-Depends:
- debhelper (>= 9),
- libmodule-build-perl
+Build-Depends: debhelper (>= 9),
+               libmodule-build-perl
 Build-Depends-Indep: libdata-serializer-perl,
- libhttp-message-perl,
- libhttp-thin-perl,
- libjson-perl (>= 2.00),
- libmoo-perl (>= 1.003000),
- libmoose-perl,
- libmoox-handlesvia-perl (>= 0.001004),
- libtest-deep-perl,
- libtry-tiny-perl,
- libtype-tiny-perl (>= 0.024),
- liburi-escape-xs-perl (>= 0.11),
- libxml-simple-perl,
- libyaml-perl,
- perl (>= 5.13.9)
+                     libhttp-message-perl,
+                     libhttp-thin-perl,
+                     libjson-perl,
+                     libmoo-perl (>= 1.003000),
+                     libmoose-perl,
+                     libmoox-handlesvia-perl,
+                     libtest-deep-perl,
+                     libtry-tiny-perl,
+                     libtype-tiny-perl,
+                     liburi-escape-xs-perl,
+                     libxml-simple-perl,
+                     libyaml-perl,
+                     perl
 Standards-Version: 3.9.8
 Vcs-Browser: https://anonscm.debian.org/cgit/pkg-perl/packages/librole-rest-client-perl.git
 Vcs-Git: https://anonscm.debian.org/git/pkg-perl/packages/librole-rest-client-perl.git
@@ -28,16 +27,16 @@ Testsuite: autopkgtest-pkg-perl
 
 Package: librole-rest-client-perl
 Architecture: all
-Depends: ${misc:Depends}, ${perl:Depends},
- libdata-serializer-perl,
- libhttp-message-perl,
- libhttp-thin-perl,
- libmoo-perl (>= 1.003000),
- libmoox-handlesvia-perl (>= 0.001004),
- libtry-tiny-perl,
- libtype-tiny-perl (>= 0.024),
- liburi-escape-xs-perl (>= 0.11),
- perl (>= 5.13.9)
+Depends: ${misc:Depends},
+         ${perl:Depends},
+         libdata-serializer-perl,
+         libhttp-message-perl,
+         libhttp-thin-perl,
+         libmoo-perl (>= 1.003000),
+         libmoox-handlesvia-perl,
+         libtry-tiny-perl,
+         libtype-tiny-perl,
+         liburi-escape-xs-perl
 Description: REST Client Role
  This REST Client role makes REST connectivity easy.
  Role::REST::Client will handle encoding and decoding when using

@@ -1,10 +1,10 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Source: https://metacpan.org/release/Role-REST-Client
 Upstream-Contact: Kaare Rasmussen <kaare at cpan dot net>
 Upstream-Name: Role-REST-Client
 
 Files: *
-Copyright: 2014, Kaare Rasmussen <kaare at cpan dot net>
+Copyright: 2016, Kaare Rasmussen <kaare at cpan dot net>
 License: Artistic or GPL-1+
 
 Files: debian/*

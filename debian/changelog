@@ -1,3 +1,16 @@
+librole-rest-client-perl (0.19-1) unstable; urgency=medium
+
+  * Team upload.
+
+   [ Nick Morrott ]
+  * Import upstream version 0.19
+  * Refresh (build)-dependencies
+  * Update debian/copyright
+  * Update debian/upstream/metadata
+  * Add manpage-has-bad-whatis-entry.patch
+
+ -- Nick Morrott <knowledgejunkie@gmail.com>  Mon, 21 Nov 2016 02:19:48 +0000
+
 librole-rest-client-perl (0.18-1) unstable; urgency=low
 
   * Initial Release. (Closes: #779729)

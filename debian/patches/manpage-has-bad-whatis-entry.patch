@@ -1,0 +1,40 @@
+Description: Correct manpage-has-bad-whatis-entry warnings from lintian
+ These issues only seem to be present in the CPAN downloads. The duplicated
+ and incomplete name sections are not present in the upstream Github repo.
+Author: Nick Morrott <knowledgejunkie@gmail.com>
+Bug: https://rt.cpan.org/Ticket/Display.html?id=118858
+Last-Update: 2016-11-21
+---
+--- a/lib/Role/REST/Client/Response.pm
++++ b/lib/Role/REST/Client/Response.pm
+@@ -36,7 +36,7 @@
+ 
+ =head1 NAME
+ 
+-Role::REST::Client::Response
++Role::REST::Client::Response - Response class for REST
+ 
+ =head1 VERSION
+ 
+@@ -51,10 +51,6 @@
+         data_callback => sub { sub { ... } },
+     );
+ 
+-=head1 NAME
+-
+-Role::REST::Client::Response - Response class for REST
+-
+ =head1 ATTRIBUTES
+ 
+ =head2 code
+--- a/lib/Role/REST/Client/Serializer.pm
++++ b/lib/Role/REST/Client/Serializer.pm
+@@ -91,7 +91,7 @@
+ 
+ =head1 NAME
+ 
+-Role::REST::Client::Serializer
++Role::REST::Client::Serializer - Serialization class for REST
+ 
+ =head1 VERSION
+ 
