@@ -1,0 +1,5 @@
+librole-rest-client-perl (0.18-1) unstable; urgency=low
+
+  * Initial Release. (Closes: #779729)
+
+ -- Michael Prokop <mika@debian.org>  Sun, 3 Jul 2016 16:10:13 +0200
