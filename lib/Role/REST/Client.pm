@@ -18,6 +18,7 @@ use Role::REST::Client::Response;
 has 'server' => (
 	isa => Str,
 	is  => 'rw',
+	default => '',
 );
 
 has 'type' => (
@@ -46,16 +47,9 @@ sub _build_user_agent {
 }
 
 has persistent_headers => (
-	is        => 'lazy',
+	is        => 'rw',
 #	isa       => HashRef[Str],
 	default   => sub { {} },
-	trigger   => sub {
-		my ( $self, $header, $old_header ) = @_;
-		# Update httpheaders if their value was initialized first
-		while (my ($key, $value) = each %$header) {
-			$self->set_header($key, $value) unless $self->exist_header($key);
-		}
-	},
 	handles_via => 'Hash',
 	handles   => {
 		set_persistent_header     => 'set',
@@ -65,10 +59,11 @@ has persistent_headers => (
 	},
 );
 
-has httpheaders => (
-	is          => 'lazy',
+has _httpheaders => (
+	is          => 'rw',
 	isa         => HashRef[Str],
-	writer      => '_set_httpheaders',
+	init_arg    => 'httpheaders',
+	default     => sub { {} },
 	handles_via => 'Hash',
 	handles     => {
 		set_header     => 'set',
@@ -76,8 +71,21 @@ has httpheaders => (
 		exist_header   => 'exists',
 		has_no_headers => 'is_empty',
 		clear_headers  => 'clear',
+		reset_headers  => 'clear',
 	},
 );
+
+sub httpheaders {
+    my $self = shift;
+	return { %{$self->persistent_headers}, %{$self->_httpheaders} };
+}
+
+sub clear_all_headers {
+    my $self = shift;
+	$self->clear_headers;
+	$self->clear_persistent_headers;
+	return {};
+}
 
 has serializer_class => (
 	isa => Str,
@@ -85,13 +93,11 @@ has serializer_class => (
 	default => sub { 'Role::REST::Client::Serializer' },
 );
 
-sub _build_httpheaders {
-	my ($self, $headers) = @_;
-	$headers ||= {};
-	$self->_set_httpheaders( { %{$self->persistent_headers}, %$headers });
-}
-
-sub reset_headers {my $self = shift;$self->_set_httpheaders({ %{$self->persistent_headers} })}
+has serializer_options => (
+	isa => HashRef,
+	is => 'ro',
+	default => sub { return {} },
+);
 
 sub _rest_response_class { 'Role::REST::Client::Response' }
 
@@ -120,7 +126,8 @@ sub _new_rest_response {
 
 sub new_serializer {
 	my ($self, @args) = @_;
-	$self->serializer_class->new(@args);
+	my %args = (%{ $self->serializer_options }, @args);
+	$self->serializer_class->new(%args);
 }
 
 sub _serializer {
@@ -145,7 +152,7 @@ sub do_request {
 
 sub _call {
 	my ($self, $method, $endpoint, $data, $args) = @_;
-	my $uri = $self->server.$endpoint;
+	my $uri = $self->server . $endpoint;
 	# If no data, just call endpoint (or uri if GET w/parameters)
 	# If data is a scalar, call endpoint with data as content (POST w/parameters)
 	# Otherwise, encode data
@@ -193,8 +200,6 @@ sub get { return shift->_request_with_query('GET', @_) }
 
 sub head { return shift->_request_with_query('HEAD', @_) }
 
-sub delete { return shift->_request_with_query('DELETE', @_) }
-
 sub _request_with_body {
 	my ($self, $method, $endpoint, $data, $args) = @_;
 	my $content = $data;
@@ -209,6 +214,8 @@ sub post { return shift->_request_with_body('POST', @_) }
 sub put { return shift->_request_with_body('PUT', @_) }
 
 sub options { return shift->_request_with_body('OPTIONS', @_) }
+
+sub delete { return shift->_request_with_query('DELETE', @_) }
 
 1;
 
@@ -259,16 +266,16 @@ Role::REST::Client - REST Client Role
 
 =head1 DESCRIPTION
 
-This REST Client role makes REST connectivety easy.
+This REST Client role makes REST connectivity easy.
 
 Role::REST::Client will handle encoding and decoding when using the HTTP verbs.
 
 	GET
+	HEAD
 	PUT
 	POST
 	DELETE
 	OPTIONS
-	HEAD
 
 Currently Role::REST::Client supports these encodings
 
@@ -285,9 +292,14 @@ x-www-form-urlencoded only works for GET and POST, and only for encoding, not de
 
 Role::REST::Client implements the standard HTTP 1.1 verbs as methods
 
-	post
+These methods can NOT have a request body
+
 	get
 	head
+
+These methods can take a request body.
+
+	post
 	put
 	delete
 	options
@@ -329,16 +341,6 @@ MIME Content-Type header,
 
 e.g. application/json
 
-=head2 httpheaders
-
-  $self->set_header('Header' => 'foo', ... );
-  $self->get_header('Header-Name');
-  $self->has_no_headers;
-  $self->clear_headers;
-
-You can set any http header you like with set_header, e.g.
-$self->set_header($key, $value) but the content-type header will be overridden.
-
 =head2 persistent_headers
 
   $self->set_persistent_header('Header' => 'foo', ... );
@@ -356,11 +358,44 @@ C<BUILD> method.
     default => sub { ... },
   );
 
+=head2 httpheaders
+
+  $self->set_header('Header' => 'foo', ... );
+  $self->get_header('Header-Name');
+  $self->has_no_headers;
+  $self->clear_headers;
+
+You can set any http header you like with set_header, e.g.
+$self->set_header($key, $value) but the content-type header will be overridden.
+
+http_headers will be reset after each request, unless there's a reserve_headers
+argument, but it's a hack. The recommended way to keep headers across requests
+is to store them in the persistent_headers.
+
+$self->httpheaders will return the combined hashref of persistent_headers and
+what's been added with set_header.
+
+For historical reasons, the two methods clear_headers and reset_headers are
+equal. Both will clear the headers for the current request, but NOT the
+persistent headers.
+
+To clear ALL headers, use
+
+  $self->clear_all_headers;
+
 =head2 clientattrs
 
 Attributes to feed the user agent object (which defaults to L<HTTP::Thin>)
 
 e.g. {timeout => 10}
+
+=head2 serializer_class
+
+You can override the serializer class and use your own. Default is 'Role::REST::Client::Serializer'
+
+=head2 serializer_options
+
+Options for the serializer instantiation.
 
 =head1 CONTRIBUTORS
 
